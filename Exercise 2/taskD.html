@@ -72,11 +72,18 @@
 	function stopExperiment() {
 		window.setTimeout("", 0);
 		testActive = false;
-		var meanDeltaTime = 0.0;
-		for (var i = 0; i < times.length; ++i) {
-			meanDeltaTime += times[i]; 
+		var meanDeltaTimePic = 0.0;
+		for (var i = 0; i <= times.length - sheepPicShown; ++i) {
+			meanDeltaTimePic += times[i]; 
 		}
-		meanDeltaTime = Math.round(meanDeltaTime / times.length);
+		var meanDeltaTimeAudio = 0.0;
+		for (var i = sheepPicShown; i < times.length; ++i) {
+			meanDeltaTimePic += times[i]; 
+		}
+		
+		
+		
+		meanDeltaTimePic = Math.round(meanDeltaTimePic / times.length);
 		var standardDerivation = 0.0;
 		for (var i = 0; i < times.length; ++i) {
 			var diff = (times[i] - meanDeltaTime);
