@@ -27,6 +27,9 @@
 	}
 	
 	function startTest() {
+		if ((sheepPicShown > 4) && (sheepSoundPlayed > 4) {
+			stopExperiment();
+		}
 		timeInSeconds = Math.random() * 4 + 2; // 2 - 6s
 		window.setTimeout("showStimulus()", timeInSeconds * 1000);
 	}
@@ -47,8 +50,9 @@
 			document.getElementById("sheepSnd").play();
 			lastTimeColorChanged = new Date().getTime();
 		} else {
-			testActive = false;
+			stopTest();
 			stopExperiment();
+			document.getElementById("instruction").innerHTML = "ERROR!";
 		}
 	}
 	
