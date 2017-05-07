@@ -12,7 +12,8 @@
 	var falseEntryAudio;
 	var sheepPicShown;
 	var sheepSoundPlayed;
-	var sheepStimuli = 5;
+	var sheepStimuli = 1;
+	document.getElementById('export').addEventListener('click', exportToCsv);
 	
 	function startExperiment() {
 		document.getElementById("sheepImg").style.display = 'none';
@@ -108,6 +109,7 @@
 		document.getElementById("instruction").innerHTML = "Press SPACE to start!";
 		times = [];
 		experimentActive = false;
+		document.getElementById("export").style.display = 'inline';
 	}
 	
 	function changeTextColor(newColor) {
@@ -152,6 +154,14 @@
 		}
 		
 	}
+	
+	function exportToCsv() {
+		var myCsv = "Col1,Col2,Col3\nval1,val2,val3";
+
+		window.open('data:text/csv;charset=utf-8,' + escape(myCsv));
+	}
+
+	
 </script>
 		<h1><p id="text">User Study</p></h1>
 		<h1 id="instruction">Press SPACE to start!</h1>
@@ -159,5 +169,8 @@
 		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
 		<p>
 		<p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p> 
+		<p>
+		<button id="export" style="display:none">export results to CSV</button>
+		</p>
 	</body>
 </html>
