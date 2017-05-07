@@ -42,11 +42,11 @@
 	
 	function sheepStimulus() {
 		
-		if (sheepPicShown < 5) {
+		if (sheepPicShown < 1) {
 			sheepPicShown++;
 			document.getElementById("sheepImg").style.display = 'inline';
 			lastTimeColorChanged = new Date().getTime();
-		} else if (sheepSoundPlayed < 5) {
+		} else if (sheepSoundPlayed < 1) {
 			sheepSoundPlayed++;
 			document.getElementById("sheepSnd").play();
 			lastTimeColorChanged = new Date().getTime();
