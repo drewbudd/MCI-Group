@@ -29,9 +29,10 @@
 	function startTest() {
 		if ((sheepPicShown > 4) && (sheepSoundPlayed > 4)) {
 			stopExperiment();
+		} else {
+			timeInSeconds = Math.random() * 4 + 2; // 2 - 6s
+			window.setTimeout("showStimulus()", timeInSeconds * 1000);
 		}
-		timeInSeconds = Math.random() * 4 + 2; // 2 - 6s
-		window.setTimeout("showStimulus()", timeInSeconds * 1000);
 	}
 	
 	function showStimulus() {
