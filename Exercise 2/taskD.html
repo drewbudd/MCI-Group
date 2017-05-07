@@ -32,7 +32,7 @@
 	}
 	
 	function showStimulus() {
-		if ((sheepPicShown > 1) && (sheepSoundPlayed > 1)) {
+		if ((sheepPicShown >= 1) && (sheepSoundPlayed >= 1)) {
 			testActive = false;
 			stopExperiment();
 		} else {
@@ -70,7 +70,7 @@
 	}
 	
 	function stopExperiment() {
-		window.setTimeout("showStimulus()", 0);
+		window.setTimeout("", 0);
 		testActive = false;
 		var meanDeltaTime = 0.0;
 		for (var i = 0; i < times.length; ++i) {
