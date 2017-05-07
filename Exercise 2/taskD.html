@@ -8,15 +8,19 @@
 	var testActive = false;
 	var times = new Array();
 	var lastTimeColorChanged;
-	var falseEntry;
-	var sheepPicShown = 0;
-	var sheepSoundPlayed = 0;
+	var falseEntryPic;
+	var falseEntryAudio;
+	var sheepPicShown;
+	var sheepSoundPlayed;
 	var sheepStimuli = 5;
 	
 	function startExperiment() {
 		document.getElementById("sheepImg").style.display = 'none';
 		experimentActive = true;
-		falseEntry = 0;
+		falseEntryPic = 0;
+		falseEntryAudio = 0;
+		sheepPicShown = 0;
+		sheepSoundPlayed = 0;
 		document.getElementById("text").innerHTML = "";
 		document.getElementById("time").innerHTML = "";
 		document.getElementById("count").innerHTML = "";
@@ -93,13 +97,14 @@
 			var diff = (times[i] - meanDeltaTimeAudio);
 			standardDeviationAudio += diff * diff; 
 		}
-		var errorRatePic = (falseEntry / (falseEntry + times.length)) * 100;
+		var errorRatePic = (falseEntryPic / (falseEntryPic + sheepPicShown)) * 100;
+		var errorRateAudio = (falseEntryAudio / (falseEntryAudio + sheepSoundPlayed)) * 100;
 		standardDeviationPic = Math.round(Math.sqrt(standardDeviationPic / sheepPicShown));
 		standardDeviationAudio = Math.round(Math.sqrt(standardDeviationAudio / sheepPicShown));
 		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepSoundPlayed;
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
-		document.getElementById("error").innerHTML = "Error rate: " + errorRate.toFixed(2) + "%";
+		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
 		document.getElementById("instruction").innerHTML = "Press SPACE to start!";
 		times = [];
 		experimentActive = false;
@@ -127,7 +132,11 @@
 					if (testActive) {
 						stopTest();
 					} else {
-						falseEntry++;
+						if (sheepPicShown < sheepStimuli){
+							falseEntryPic++;
+						} else {
+							falseEntryAudio++;
+						}
 					}
 				}
 				break;
