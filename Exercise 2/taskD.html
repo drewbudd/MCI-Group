@@ -37,18 +37,23 @@
 	}
 	
 	function sheepStimulus() {
-		var selection = Math.random();
-		if (selection < 0.5) {
+		
+		if (sheepPicShown < 5) {
+			sheepPicShown++;
 			document.getElementById("sheepImg").style.display = 'inline';
 			lastTimeColorChanged = new Date().getTime();
-		} else {
+		} else if (sheepSoundPlayed < 5) {
+			sheepSoundPlayed++;
 			document.getElementById("sheepSnd").play();
 			lastTimeColorChanged = new Date().getTime();
+		} else {
+			stopExperiment();
 		}
 	}
 	
 	function stopTest() {
 		document.getElementById("sheepImg").style.display = 'none';
+		document.getElementById("sheepSnd").stop();
 		var currTime = new Date().getTime();
 		var deltaTime = currTime - lastTimeColorChanged;
 		times.push(deltaTime);
