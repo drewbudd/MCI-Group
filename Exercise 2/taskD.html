@@ -33,18 +33,18 @@
 	}
 	
 	function startTest() {
-		timeInSeconds = Math.random() * 4 + 2; // 2 - 6s
-		window.setTimeout("showStimulus()", timeInSeconds * 1000);
-	}
-	
-	function showStimulus() {
 		if ((sheepPicShown >= sheepStimuli) && (sheepSoundPlayed >= sheepStimuli)) {
 			testActive = false;
 			stopExperiment();
 		} else {
-			testActive = true;
-			sheepStimulus();
+			timeInSeconds = Math.random() * 4 + 2; // 2 - 6s
+			window.setTimeout("showStimulus()", timeInSeconds * 1000);
 		}
+	}
+	
+	function showStimulus() {
+		testActive = true;
+		sheepStimulus();
 	}
 	
 	function sheepStimulus() {
@@ -110,7 +110,7 @@
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
 		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
-		document.getElementById("instruction").innerHTML = 'Press "s" to start!';
+		document.getElementById("instruction").innerHTML = 'Press "S" to start!';
 		
 		// export times before clearing
 		myCsv = "Data,\n";
@@ -185,7 +185,7 @@
 		<p><img id="sheepImg" src="sheep.jpg" style="display:none"></p>
 		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
 		<p>
-		<p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p> 
+		<p id="countdown"></p> <p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p> 
 		<p>
 		<button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button>
 		</p>
