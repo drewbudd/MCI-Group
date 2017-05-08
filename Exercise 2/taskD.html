@@ -12,8 +12,8 @@
 	var falseEntryAudio;
 	var sheepPicShown;
 	var sheepSoundPlayed;
-	var sheepStimuli = 1;
-	//document.getElementById("export").addEventListener('click', exportToCsv);
+	var sheepStimuli = 3;
+	var myCsv = "";
 	
 	function startExperiment() {
 		document.getElementById("sheepImg").style.display = 'none';
@@ -100,13 +100,34 @@
 		}
 		var errorRatePic = (falseEntryPic / (falseEntryPic + sheepPicShown)) * 100;
 		var errorRateAudio = (falseEntryAudio / (falseEntryAudio + sheepSoundPlayed)) * 100;
+		
+		// calculate std dev
 		standardDeviationPic = Math.round(Math.sqrt(standardDeviationPic / sheepPicShown));
 		standardDeviationAudio = Math.round(Math.sqrt(standardDeviationAudio / sheepPicShown));
+		
+		// display results
 		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepSoundPlayed;
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
 		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
 		document.getElementById("instruction").innerHTML = "Press SPACE to start!";
+		
+		// export times before clearing
+		myCsv = "Data,\n";
+		
+		myCsv += "Picture,";
+		for (var i=0; i < sheepPicShown; ++i) {
+			myCsv += times[i] + ",";
+		}
+		myCsv += "Count," + sheepPicShown + ",Mean," + meanDeltaTimePic + ",SD," + standardDeviationPic + ",Error Rate," + errorRatePic + ",";
+		
+		myCsv += "\nAudio,";
+		for (var i=sheepPicShown; i < times.length; ++i) {
+			myCsv += times[i] + ",";
+		}
+		myCsv += "Count," + sheepSoundPlayed + ",Mean," + meanDeltaTimeAudio + ",SD," + standardDeviationAudio + ",Error Rate," + errorRateAudio + ",";
+		
+		// reset variables to starting state
 		times = [];
 		experimentActive = false;
 		document.getElementById("export").style.display = 'inline';
@@ -156,8 +177,6 @@
 	}
 	
 	function exportToCsv() {
-		var myCsv = "Col1,Col2,Col3\nval1,val2,val3";
-
 		window.open('data:text/csv;charset=utf-8,' + escape(myCsv));
 	}
 
