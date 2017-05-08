@@ -13,7 +13,7 @@
 	var sheepPicShown;
 	var sheepSoundPlayed;
 	var sheepStimuli = 1;
-	document.getElementById('export').addEventListener('click', exportToCsv);
+	//document.getElementById("export").addEventListener('click', exportToCsv);
 	
 	function startExperiment() {
 		document.getElementById("sheepImg").style.display = 'none';
@@ -170,7 +170,7 @@
 		<p>
 		<p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p> 
 		<p>
-		<button id="export" style="display:none">export results to CSV</button>
+		<button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button>
 		</p>
 	</body>
 </html>
