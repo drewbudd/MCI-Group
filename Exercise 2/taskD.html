@@ -110,7 +110,7 @@
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
 		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
-		document.getElementById("instruction").innerHTML = "Press SPACE to start!";
+		document.getElementById("instruction").innerHTML = 'Press "s" to start!';
 		
 		// export times before clearing
 		myCsv = "Data,\n";
@@ -148,18 +148,13 @@
 		switch (e.which || e.charCode || e.keyCode) {
 			case 32:
 			// space
-				if (!experimentActive) {
-					startExperiment(); 
-				}
-				else {
-					if (testActive) {
-						stopTest();
+				if (testActive) {
+					stopTest();
+				} else {
+					if (sheepPicShown < sheepStimuli){
+						falseEntryPic++;
 					} else {
-						if (sheepPicShown < sheepStimuli){
-							falseEntryPic++;
-						} else {
-							falseEntryAudio++;
-						}
+						falseEntryAudio++;
 					}
 				}
 				break;
@@ -168,8 +163,11 @@
 					stopExperiment();
 				}
 				break;
-			//case 66:
-				// b
+			case 83: //s
+				if (!experimentActive) {
+					startExperiment();
+				}
+				break;
 				// here you can extend... alert("pressed the b key"); break;
 				//break;
 		}
@@ -183,7 +181,7 @@
 	
 </script>
 		<h1><p id="text">User Study</p></h1>
-		<h1 id="instruction">Press SPACE to start!</h1>
+		<h1 id="instruction">Press "S" to start!</h1>
 		<p><img id="sheepImg" src="sheep.jpg" style="display:none"></p>
 		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
 		<p>
