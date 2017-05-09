@@ -6,13 +6,17 @@
 <script type="text/javascript">
 	var experimentActive = false;
 	var testActive = false;
+	var sheepTestActive = false;
+	var shapeTestActive = false;
 	var resetting = false;
 	var sheepTimes = new Array();
+	var shapeTimes = new Array();
 	var timeStimulusStarted;
 	var falseEntryPic;
 	var falseEntryAudio;
+	var falseEntryShape;
 	var sheepPicShown;
-	var sheepSoundPlayed;
+	var sheepAudioPlayed;
 	var sheepStimuli = 3;
 	var myCsv = "";
 
@@ -24,7 +28,8 @@
 		falseEntryPic = 0;
 		falseEntryAudio = 0;
 		sheepPicShown = 0;
-		sheepSoundPlayed = 0;
+		sheepAudioPlayed = 0;
+		squareShown = 0;
 		document.getElementById("text").innerHTML = "";
 		document.getElementById("time").innerHTML = "";
 		document.getElementById("count").innerHTML = "";
@@ -37,7 +42,7 @@
 	}
 
 	function startTest() {
-		if ((sheepPicShown >= sheepStimuli) && (sheepSoundPlayed >= sheepStimuli)) {
+		if ((sheepPicShown >= sheepStimuli) && (sheepAudioPlayed >= sheepStimuli)) {
 			testActive = false;
 			stopExperiment();
 		} else {
@@ -48,8 +53,8 @@
 
 	function showStimulus() {
 		testActive = true;
-		sheepStimulus();
-		//choiceStimulus();
+		//sheepStimulus();
+		choiceStimulus();
 	}
 
 	function sheepStimulus() {
@@ -58,8 +63,8 @@
 			sheepPicShown++;
 			document.getElementById("sheepImg").style.display = 'inline';
 			timeStimulusStarted = new Date().getTime();
-		} else if (sheepSoundPlayed < sheepStimuli) {
-			sheepSoundPlayed++;
+		} else if (sheepAudioPlayed < sheepStimuli) {
+			sheepAudioPlayed++;
 			document.getElementById("sheepSnd").play();
 			timeStimulusStarted = new Date().getTime();
 		} else {
@@ -70,8 +75,9 @@
 	}
 
 	function choiceStimulus() {
-		timeStimulusStarted = new Date().getTime();
-		var canvas = document.getElementById('circle');
+
+		var canvas = document.getElementById('shape');
+
 		if (Math.random() < 0.5) {
 			if (canvas.getContext) {
 				var ctx = canvas.getContext('2d');
@@ -83,9 +89,15 @@
 				ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
 				ctx.fillStyle = 'black';
 				ctx.fill();
+
+				window.setTimeout("clearCanvas()", 3000);
+				startTest();
 			}
 		} else {
 			if (canvas.getContext) {
+				shapeTestActive = true;
+				timeStimulusStarted = new Date().getTime();
+				squareShown++;
 				var ctx = canvas.getContext('2d');
 				var H = (Math.random() * 100) + 75;
 				ctx.rect((canvas.width/2) - (H/2) ,(canvas.height/2) - (H/2),H,H);
@@ -97,54 +109,62 @@
 
 	function stopTest() {
 		document.getElementById("sheepImg").style.display = 'none';
-		document.getElementById('circle').getContext('2d').rect(0, 0, 350, 350);
-		document.getElementById('circle').getContext('2d').fillStyle= 'white';
-		document.getElementById('circle').getContext('2d').fill();
+		clearCanvas();
 		var currTime = new Date().getTime();
 		var deltaTime = currTime - timeStimulusStarted;
-		sheepTimes.push(deltaTime);
+		//sheepTimes.push(deltaTime);
+		shapeTimes.push(deltaTime);
 		document.getElementById("time").innerHTML = deltaTime + "ms";
 		testActive = false;
 		startTest();
 	}
 
+	function clearCanvas() {
+		document.getElementById('shape').getContext('2d').rect(0, 0, 350, 350);
+		document.getElementById('shape').getContext('2d').fillStyle= 'white';
+		document.getElementById('shape').getContext('2d').fill();
+	}
+
 	function stopExperiment() {
 		window.setTimeout("", 0);
 		testActive = false;
-		var meanDeltaTimePic = calcMeanDeltaTime(sheepTimes, 0, sheepPicShown);
 
+		/*var meanDeltaTimePic = calcMeanDeltaTime(sheepTimes, 0, sheepPicShown);
 		var meanDeltaTimeAudio = calcMeanDeltaTime(sheepTimes, sheepPicShown, sheepTimes.length);
 
-		meanDeltaTimePic = Math.round(meanDeltaTimePic / sheepPicShown);
-		meanDeltaTimeAudio = Math.round(meanDeltaTimeAudio / sheepSoundPlayed);
-		var standardDeviationPic = 0.0;
-		for (var i = 0; i < sheepPicShown; ++i) {
-			var diff = (sheepTimes[i] - meanDeltaTimePic);
-			standardDeviationPic += diff * diff;
-		}
-		var standardDeviationAudio = 0.0;
-		for (var i = sheepPicShown; i < sheepTimes.length; ++i) {
-			var diff = (sheepTimes[i] - meanDeltaTimeAudio);
-			standardDeviationAudio += diff * diff;
-		}
-		var errorRatePic = (falseEntryPic / (falseEntryPic + sheepPicShown)) * 100;
-		var errorRateAudio = (falseEntryAudio / (falseEntryAudio + sheepSoundPlayed)) * 100;
 
 		// calculate std dev
-		standardDeviationPic = Math.round(Math.sqrt(standardDeviationPic / sheepPicShown));
-		standardDeviationAudio = Math.round(Math.sqrt(standardDeviationAudio / sheepPicShown));
+		var standardDeviationPic = calcStandardDeviation(sheepTimes, 0, sheepPicShown, meanDeltaTimePic);
+		var standardDeviationAudio = calcStandardDeviation(sheepTimes, sheepPicShown, sheepTimes.length, meanDeltaTimeAudio);
+
+		// calc errorRate
+		var errorRatePic = (falseEntryPic / (falseEntryPic + sheepPicShown)) * 100;
+		var errorRateAudio = (falseEntryAudio / (falseEntryAudio + sheepAudioPlayed)) * 100;
 
 		// display results
-		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepSoundPlayed;
+		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepAudioPlayed;
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
 		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
 		document.getElementById("instruction").innerHTML = 'Please wait...resetting experiment';
+		*/
+
+		var meanDeltaTimeShape = calcMeanDeltaTime(shapeTimes, 0, shapeTimes.length);
+		var standardDeviationShape = calcStandardDeviation(shapeTimes, 0, shapeTimes.length, meanDeltaTimeShape);
+		var errorRateShape = (falseEntryShape / (falseEntryShape + shapeTimes.length)) * 100;
+
+		document.getElementById("count").innerHTML = "Count: " + shapeTimes.length;
+		document.getElementById("mean").innerHTML = "Mean: " + meanDeltaTimeShape + "ms";
+		document.getElementById("sd").innerHTML = "SD: " + standardDeviationShape +	"ms";
+		document.getElementById("error").innerHTML = "Error rate: " + errorRateShape.toFixed(2) + "%";
+		document.getElementById("instruction").innerHTML = 'Please wait...resetting experiment';
+
 
 		resetting = true;
 		window.setTimeout("showStart()", 6000);
 
 		// export times before clearing
+		/*
 		myCsv = "Data,\n";
 
 		myCsv += "Picture,";
@@ -157,12 +177,17 @@
 		for (var i=sheepPicShown; i < sheepTimes.length; ++i) {
 			myCsv += sheepTimes[i] + ",";
 		}
-		myCsv += "Count," + sheepSoundPlayed + ",Mean," + meanDeltaTimeAudio + ",SD," + standardDeviationAudio + ",Error Rate," + errorRateAudio + ",";
+		myCsv += "Count," + sheepAudioPlayed + ",Mean," + meanDeltaTimeAudio + ",SD," + standardDeviationAudio + ",Error Rate," + errorRateAudio + ",";
+		*/
 
 		// reset variables to starting state
-		sheepTimes = [];
+		//sheepTimes = [];
+		shapeTimes = [];
 		experimentActive = false;
 		document.getElementById("export").style.display = 'inline';
+
+		// set it later to width = 0, height = 0
+		//document.getElementById('shape').style.display = 'inline';
 
 		// make sure image is shown with source link
 		document.getElementById("sheepImg").style.display = 'inline';
@@ -175,12 +200,24 @@ function calcMeanDeltaTime(times, start, end) {
 		meanDeltaTime += times[i];
 	}
 
+	meanDeltaTime = Math.round(meanDeltaTime / (end - start));
+
 	return meanDeltaTime;
 }
 
+function calcStandardDeviation (times, start, end, meanDeltaTime){
+	var standardDeviation = 0.0;
+	for (var i = start; i < end; ++i) {
+		var diff = (times[i] - meanDeltaTime);
+		standardDeviation += diff * diff;
+	}
+	standardDeviation = Math.round(Math.sqrt(standardDeviation / (end - start)));
+
+	return standardDeviation;
+}
 /*
 	function displayResults(count, mean, stdDev, errorRate) {
-		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepSoundPlayed;
+		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepAudioPlayed;
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
 		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
@@ -203,13 +240,17 @@ function calcMeanDeltaTime(times, start, end) {
 		switch (e.which || e.charCode || e.keyCode) {
 			case 32:
 			// space
-				if (testActive && !resetting) {
+				if (testActive && !resetting && shapeTestActive) {
 					stopTest();
 				} else {
-					if (sheepPicShown < sheepStimuli){
-						falseEntryPic++;
-					} else {
-						falseEntryAudio++;
+					if (sheepTestActive) {
+						if (sheepPicShown < sheepStimuli){
+							falseEntryPic++;
+						} else {
+							falseEntryAudio++;
+						}
+					} else if (shapeTestActive) {
+						falseEntryShape++;
 					}
 				}
 				break;
@@ -245,7 +286,7 @@ function calcMeanDeltaTime(times, start, end) {
 		<p><img id="sheepImg" src="sheep.jpg" style="display:none"></p>
 		<p id="sheepSource"></p>
 		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
-		<canvas id="circle" width="350" height="350"></canvas>
+		<canvas id="shape" width="350" height="350"></canvas>
 		<p>
 		<p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p>
 		<p>
