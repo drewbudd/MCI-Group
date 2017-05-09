@@ -4,8 +4,9 @@
 <title>Human Capabilities - Reaction test</title> </head>
 <body>
 <script type="text/javascript">
-	var experimentActive = false; 
+	var experimentActive = false;
 	var testActive = false;
+	var resetting = false;
 	var times = new Array();
 	var lastTimeColorChanged;
 	var falseEntryPic;
@@ -14,9 +15,11 @@
 	var sheepSoundPlayed;
 	var sheepStimuli = 3;
 	var myCsv = "";
-	
+
+
 	function startExperiment() {
 		document.getElementById("sheepImg").style.display = 'none';
+		document.getElementById("export").style.display = 'none';
 		experimentActive = true;
 		falseEntryPic = 0;
 		falseEntryAudio = 0;
@@ -28,10 +31,11 @@
 		document.getElementById("mean").innerHTML = "";
 		document.getElementById("sd").innerHTML = "";
 		document.getElementById("error").innerHTML = "";
+		document.getElementById("sheepSource").innerHTML = "";
 		document.getElementById("instruction").innerHTML = "Press SPACE when you see or hear the sheep! Press 'a' for results!";
 		startTest();
 	}
-	
+
 	function startTest() {
 		if ((sheepPicShown >= sheepStimuli) && (sheepSoundPlayed >= sheepStimuli)) {
 			testActive = false;
@@ -41,14 +45,14 @@
 			window.setTimeout("showStimulus()", timeInSeconds * 1000);
 		}
 	}
-	
+
 	function showStimulus() {
 		testActive = true;
 		sheepStimulus();
 	}
-	
+
 	function sheepStimulus() {
-		
+
 		if (sheepPicShown < sheepStimuli) {
 			sheepPicShown++;
 			document.getElementById("sheepImg").style.display = 'inline';
@@ -63,10 +67,9 @@
 			document.getElementById("instruction").innerHTML = "ERROR!";
 		}
 	}
-	
+
 	function stopTest() {
 		document.getElementById("sheepImg").style.display = 'none';
-		//document.getElementById("sheepSnd").stop();
 		var currTime = new Date().getTime();
 		var deltaTime = currTime - lastTimeColorChanged;
 		times.push(deltaTime);
@@ -74,77 +77,84 @@
 		testActive = false;
 		startTest();
 	}
-	
+
 	function stopExperiment() {
 		window.setTimeout("", 0);
 		testActive = false;
 		var meanDeltaTimePic = 0.0;
 		for (var i = 0; i < sheepPicShown; ++i) {
-			meanDeltaTimePic += times[i]; 
+			meanDeltaTimePic += times[i];
 		}
 		var meanDeltaTimeAudio = 0.0;
 		for (var i = sheepPicShown; i < times.length; ++i) {
-			meanDeltaTimeAudio += times[i]; 
-		}		
+			meanDeltaTimeAudio += times[i];
+		}
 		meanDeltaTimePic = Math.round(meanDeltaTimePic / sheepPicShown);
 		meanDeltaTimeAudio = Math.round(meanDeltaTimeAudio / sheepSoundPlayed);
 		var standardDeviationPic = 0.0;
 		for (var i = 0; i < sheepPicShown; ++i) {
 			var diff = (times[i] - meanDeltaTimePic);
-			standardDeviationPic += diff * diff; 
+			standardDeviationPic += diff * diff;
 		}
 		var standardDeviationAudio = 0.0;
 		for (var i = sheepPicShown; i < times.length; ++i) {
 			var diff = (times[i] - meanDeltaTimeAudio);
-			standardDeviationAudio += diff * diff; 
+			standardDeviationAudio += diff * diff;
 		}
 		var errorRatePic = (falseEntryPic / (falseEntryPic + sheepPicShown)) * 100;
 		var errorRateAudio = (falseEntryAudio / (falseEntryAudio + sheepSoundPlayed)) * 100;
-		
+
 		// calculate std dev
 		standardDeviationPic = Math.round(Math.sqrt(standardDeviationPic / sheepPicShown));
 		standardDeviationAudio = Math.round(Math.sqrt(standardDeviationAudio / sheepPicShown));
-		
+
 		// display results
 		document.getElementById("count").innerHTML = "Count Picture: " + sheepPicShown + "<br/>" + "Count Sound: " + sheepSoundPlayed;
 		document.getElementById("mean").innerHTML = "Mean Picture: " + meanDeltaTimePic + "ms" + "<br/>" + "Mean Sound: " + meanDeltaTimeAudio + "ms";
 		document.getElementById("sd").innerHTML = "SD Picture: " + standardDeviationPic +	"ms" + "<br/>" + "SD Sound: " + standardDeviationAudio +	"ms";
 		document.getElementById("error").innerHTML = "Error rate Picture: " + errorRatePic.toFixed(2) + "%" + "<br/>" + "Error rate Sound: " + errorRateAudio.toFixed(2) + "%";
-		document.getElementById("instruction").innerHTML = 'Press "S" to start!';
-		
+		document.getElementById("instruction").innerHTML = 'Please wait...resetting experiment';
+
+		resetting = true;
+		window.setTimeout("showStart()", 6000);
+
 		// export times before clearing
 		myCsv = "Data,\n";
-		
+
 		myCsv += "Picture,";
 		for (var i=0; i < sheepPicShown; ++i) {
 			myCsv += times[i] + ",";
 		}
 		myCsv += "Count," + sheepPicShown + ",Mean," + meanDeltaTimePic + ",SD," + standardDeviationPic + ",Error Rate," + errorRatePic + ",";
-		
+
 		myCsv += "\nAudio,";
 		for (var i=sheepPicShown; i < times.length; ++i) {
 			myCsv += times[i] + ",";
 		}
 		myCsv += "Count," + sheepSoundPlayed + ",Mean," + meanDeltaTimeAudio + ",SD," + standardDeviationAudio + ",Error Rate," + errorRateAudio + ",";
-		
+
 		// reset variables to starting state
 		times = [];
 		experimentActive = false;
 		document.getElementById("export").style.display = 'inline';
+
+		// make sure image is shown with source link
+		document.getElementById("sheepImg").style.display = 'inline';
+		document.getElementById("sheepSource").innerHTML = 'image source(<a href="https://pixabay.com/en/sheep-lamb-lambs-animals-348956/">https://pixabay.com/en/sheep-lamb-lambs-animals-348956/</a>)';
 	}
-	
+
 	function changeTextColor(newColor) {
 		document.getElementById("text").style.color = newColor;
 		document.getElementById("text").style.backgroundColor = newColor;
 		lastTimeColorChanged = new Date().getTime();
 	}
-	
-	document.onkeydown = function onKey(e) { 
-		
+
+	document.onkeydown = function onKey(e) {
+
 		if (e == null) {
 			e = window.event;
 		}
-		
+
 		switch (e.which || e.charCode || e.keyCode) {
 			case 32:
 			// space
@@ -164,28 +174,34 @@
 				}
 				break;
 			case 83: //s
-				if (!experimentActive) {
+				if (!experimentActive && !resetting) {
 					startExperiment();
 				}
 				break;
 				// here you can extend... alert("pressed the b key"); break;
 				//break;
 		}
-		
+
 	}
-	
+
 	function exportToCsv() {
 		window.open('data:text/csv;charset=utf-8,' + escape(myCsv));
 	}
 
-	
+	function showStart() {
+		document.getElementById("instruction").innerHTML = 'Press "S" to start!';
+		resetting = false;
+	}
+
+
 </script>
 		<h1><p id="text">User Study</p></h1>
 		<h1 id="instruction">Press "S" to start!</h1>
 		<p><img id="sheepImg" src="sheep.jpg" style="display:none"></p>
+		<p id="sheepSource"></p>
 		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
 		<p>
-		<p id="countdown"></p> <p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p> 
+		<p id="time"></p> <p id="count"></p> <p id="mean"></p> <p id="sd"></p> <p id="error"></p>
 		<p>
 		<button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button>
 		</p>
