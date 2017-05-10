@@ -8,6 +8,7 @@
       var myCsv;
       var experimentActive = false;
       var stimuliActive = false;
+      var showingResults = false;
       var aborting = false;
       var name;
       var age;
@@ -18,6 +19,9 @@
       var stimuliCount;
       var timeStimulusStarted;
       var errorCount;
+      var meanDeltaTime;
+      var standardDeviation;
+      var totalTestCount;
 
 
       /* Function to handle keypresses
@@ -53,12 +57,18 @@
 
     	}
 
+
+      function exportToCsv() {
+    		window.open('data:text/csv;charset=utf-8,' + escape(myCsv));
+    	}
+
       /* sets all variables to their default starting state
       */
       function setStartingState() {
         myCsv = "";
         experimentActive = false;
         stimuliActive = false;
+        showingResults = false;
         aborting = false;
         name = "";
         age = "";
@@ -68,6 +78,9 @@
         currentTask = '';
         stimuliCount = 0;
         errorCount = 0;
+        meanDeltaTime = 0.0;
+        standardDeviation = 0.0;
+        totalTestCount = 3;
       }
 
       /* Function to start the experiment, prompts user for information.
@@ -117,6 +130,7 @@
 
       function startTask() {
         if (aborting) {
+          displayResults();
           return;
         }
 
@@ -141,13 +155,14 @@
       function showStimulus() {
         switch(currentTask) {
           case 'SIMPLE':
-            if (stimuliCount < 1) {
+            if (stimuliCount < totalTestCount) {
               document.getElementById("stimulusArea").innerHTML = '<img src="sheep.jpg">';
-            } else if (stimuliCount < 40){
+            } else if (!picResultsShown) {
+              displayResults();
+            } else if (stimuliCount < 2 * totalTestCount){
               document.getElementById("sheepSnd").play();
             } else {
               tasks.splice(pos, tasks.indexOf('SIMPLE'));
-              currentTask = '';
               return;
             }
             stimuliActive = true;
@@ -173,6 +188,47 @@
         document.getElementById("time").innerHTML = deltaTime + "ms";
         document.getElementById("stimulusArea").innerHTML = "";
         startTask();
+      }
+
+      /* calculates, saves and shows the results and statistics
+      */
+      function displayResults() {
+        calculateStatistics();
+        saveResults();
+
+        document.getElementById("count").innerHTML = "Count: " + sheepPicShown;
+    		document.getElementById("mean").innerHTML = "Mean: " + meanDeltaTimePic + "ms";
+    		document.getElementById("sd").innerHTML = "SD: " + standardDeviationPic +	"ms";
+    		document.getElementById("error").innerHTML = "Error rate: " + errorRatePic.toFixed(2) + "%";
+
+        showingResults = true;
+      }
+
+      /* calculates statistics for the current times
+      */
+      function calculateStatistics() {
+      	for (var i = 0; i < times.size; i++) {
+      		meanDeltaTime += times[i];
+      	}
+
+      	meanDeltaTime = Math.round(meanDeltaTime / times.size);
+
+      	for (var i = start; i < times.size; i++) {
+      		var diff = (times[i] - meanDeltaTime);
+      		standardDeviation += diff * diff;
+      	}
+
+      	standardDeviation = Math.round(Math.sqrt(standardDeviation / times.size);
+      }
+
+      /* saves results and statistics for the current times
+      */
+      function saveResults() {
+
+      }
+
+      function endExperiment() {
+
       }
 
     </script>
