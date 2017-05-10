@@ -53,6 +53,11 @@
               startExperiment();
             }
             break;
+          case 67: //c
+            if(showingResults){
+              setStartingState();
+              selectTask();
+            }
     				// here you can extend... alert("pressed the b key"); break;
     				//break;
     		}
@@ -91,7 +96,6 @@
     		document.getElementById("mean").innerHTML = "";
     		document.getElementById("sd").innerHTML = "";
     		document.getElementById("error").innerHTML = "";
-
       }
 
       /* Function to start the experiment, prompts user for information.
@@ -175,7 +179,6 @@
       function showStimulus() {
         switch(currentTask) {
           case 'SIMPLE':
-
             if (stimuliCount < totalTestCount && !picResultsShown) {
               document.getElementById("stimulusArea").innerHTML = '<img src="sheep.jpg">';
             } else if (!picResultsShown) {
@@ -219,9 +222,6 @@
       /* calculates, saves and shows the results and statistics
       */
       function displayResults() {
-        if (currentTask === 'SIMPLE' && !picResultsShown) {
-          picResultsShown = true;
-        }
         calculateStatistics();
         saveResults();
 
@@ -233,6 +233,9 @@
         document.getElementById("export").style.display = 'inline';
 
         showingResults = true;
+        if (currentTask === 'SIMPLE' && !picResultsShown) {
+          picResultsShown = true;
+        }
       }
 
       /* calculates statistics for the current times
@@ -251,7 +254,7 @@
 
       	standardDeviation = Math.round(Math.sqrt(standardDeviation / times.length));
 
-        errorRate = errorCount / (errorCount + stimuliCount);
+        errorRate = (errorCount / (errorCount + stimuliCount)) * 100;
       }
 
       /* saves results and statistics for the current times
@@ -282,7 +285,7 @@
       }
 
     </script>
-    <h1><p = "text">User Study</p></h1>
+    <h1><p id="text">User Study</p></h1>
     <h1 id="instruction">Press "S" to start!</h1>
 		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
     <br/>
