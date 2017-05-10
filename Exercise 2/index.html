@@ -5,7 +5,7 @@
   </head>
   <body>
     <script type="text/javascript">
-      var myCsv;
+      var myCsv = "";
       var experimentActive = false;
       var stimuliActive = false;
       var showingResults = false;
@@ -72,7 +72,6 @@
       /* sets all variables to their default starting state
       */
       function setStartingState() {
-        myCsv = "";
         experimentActive = false;
         stimuliActive = false;
         showingResults = false;
@@ -87,7 +86,7 @@
         errorRate = 0.0;
         meanDeltaTime = 0.0;
         standardDeviation = 0.0;
-        totalTestCount = 3;
+        totalTestCount = 20;
 
         document.getElementById("export").style.display = 'none';
         document.getElementById("text").style.display = 'none';
@@ -110,22 +109,21 @@
       /* Displays text entry fields for user's information
       */
       function collectUserInfo() {
-        document.getElementById("stimulusArea").innerHTML = '<p>Name <input id="testeeName" type="text"></p><p>Age <input id="age" type="text"></p><p>Gender <input type="radio" name="gender" value="male">Male <input type="radio" name="gender" value="female">Female </p><p><button id="submit" onclick="saveUserData()">Submit</button></p>';
+        document.getElementById("stimulusArea").innerHTML = '<p>Age <input id="age" type="text"></p><p>Gender <input type="radio" name="gender" value="male">Male <input type="radio" name="gender" value="female">Female </p><p><button id="submit" onclick="saveUserData()">Submit</button></p>';
       }
 
       /* OnClick of submit button is all of the user's information saved and the next step is started.
       */
       function saveUserData() {
-        name = document.getElementById("testeeName").value;
         age = document.getElementById("age").value;
         var genders = document.getElementsByName("gender");
         for (var i = 0; i < genders.length; i++) {
           if (genders[i].checked) {
-            gender = genders[i];
+            gender = genders[i].value;
           }
         }
 
-        myCsv += "Name," + name + ",Age," + age + ",Gender," + gender + ",\n";
+        myCsv += ",Age," + age + ",Gender," + gender + ",\n";
 
         document.getElementById("stimulusArea").innerHTML = "";
         selectTask();
@@ -140,8 +138,7 @@
         }
 
         var selection = Math.trunc(Math.random() * tasks.length);
-        //currentTask = tasks[selection];
-        currentTask = 'SIMPLE';
+        currentTask = tasks[selection];
         startTask();
       }
 
@@ -164,6 +161,8 @@
           case 'CHOICE':
           case 'COMPLEX':
           case 'CREATIVE':
+            selectTask();
+            return;
             document.getElementById("stimulusArea").innerHTML = "CREATIVE";
             break;
           default:
@@ -187,7 +186,6 @@
             } else if (stimuliCount < totalTestCount){
               document.getElementById("sheepSnd").play();
             } else {
-              tasks.splice(pos, tasks.indexOf(currentTask));
               displayResults();
               return;
             }
@@ -235,6 +233,8 @@
         showingResults = true;
         if (currentTask === 'SIMPLE' && !picResultsShown) {
           picResultsShown = true;
+        } else {
+          tasks.splice(pos, tasks.indexOf(currentTask));
         }
       }
 
