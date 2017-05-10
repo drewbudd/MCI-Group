@@ -1,0 +1,46 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Human Capabilities - Reaction test</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+
+
+    /* Function to handle keypresses
+     */
+    document.onkeydown = function onKey(e) {
+
+  		if (e == null) {
+  			e = window.event;
+  		}
+
+  		switch (e.which || e.charCode || e.keyCode) {
+  			case 32:
+  			// space
+
+  				break;
+  			case 65: // a
+
+          break;
+  			case 83: //s
+
+          break;
+  				// here you can extend... alert("pressed the b key"); break;
+  				//break;
+  		}
+
+  	}
+
+    </script>
+    <h1><p = "text">User Study</p></h1>
+    <h1 id="instruction">Press "S" to start!</h1>
+    <p id="stimulusArea"></p>
+    <br/>
+    <p id="time"></p>
+    <p id="count"></p>
+    <p id="mean"></p>
+    <p id="sd"></p>
+    <p><button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button></p>
+  </body>
+</html>
