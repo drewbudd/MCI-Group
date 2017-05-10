@@ -10,15 +10,17 @@
       var stimuliActive = false;
       var showingResults = false;
       var aborting = false;
+      var picResultsShown = false;
       var name;
       var age;
       var gender;
       var times;
-      var tasks;
+      var tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
       var currentTask;
       var stimuliCount;
       var timeStimulusStarted;
       var errorCount;
+      var errorRate;
       var meanDeltaTime;
       var standardDeviation;
       var totalTestCount;
@@ -74,13 +76,22 @@
         age = "";
         gender = "";
         times = new Array();
-        tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
         currentTask = '';
         stimuliCount = 0;
         errorCount = 0;
+        errorRate = 0.0;
         meanDeltaTime = 0.0;
         standardDeviation = 0.0;
         totalTestCount = 3;
+
+        document.getElementById("export").style.display = 'none';
+        document.getElementById("text").style.display = 'none';
+    		document.getElementById("time").innerHTML = "";
+    		document.getElementById("count").innerHTML = "";
+    		document.getElementById("mean").innerHTML = "";
+    		document.getElementById("sd").innerHTML = "";
+    		document.getElementById("error").innerHTML = "";
+
       }
 
       /* Function to start the experiment, prompts user for information.
@@ -95,13 +106,13 @@
       /* Displays text entry fields for user's information
       */
       function collectUserInfo() {
-        document.getElementById("stimulusArea").innerHTML = '<p>Name <input id="name" type="text"></p><p>Age <input id="age" type="text"></p><p>Gender <input type="radio" name="gender" value="male">Male <input type="radio" name="gender" value="female">Female </p><p><button id="submit" onclick="saveUserData()">Submit</button></p>';
+        document.getElementById("stimulusArea").innerHTML = '<p>Name <input id="testeeName" type="text"></p><p>Age <input id="age" type="text"></p><p>Gender <input type="radio" name="gender" value="male">Male <input type="radio" name="gender" value="female">Female </p><p><button id="submit" onclick="saveUserData()">Submit</button></p>';
       }
 
       /* OnClick of submit button is all of the user's information saved and the next step is started.
       */
       function saveUserData() {
-        name = document.getElementById("name").value;
+        name = document.getElementById("testeeName").value;
         age = document.getElementById("age").value;
         var genders = document.getElementsByName("gender");
         for (var i = 0; i < genders.length; i++) {
@@ -109,6 +120,8 @@
             gender = genders[i];
           }
         }
+
+        myCsv += "Name," + name + ",Age," + age + ",Gender," + gender + ",\n";
 
         document.getElementById("stimulusArea").innerHTML = "";
         selectTask();
@@ -128,17 +141,21 @@
         startTask();
       }
 
+      /* this function controls displaying instructions and starting the stimulus countdown
+      */
       function startTask() {
         if (aborting) {
           displayResults();
           return;
         }
 
-        var displayDelay = Math.random() * 4 + 2;
-        window.setTimeout("showStimulus()", displayDelay * 1000);
-
         switch(currentTask) {
           case 'SIMPLE':
+            if (!picResultsShown) {
+              document.getElementById("instruction").innerHTML = "Press SPACE when you see the sheep!";
+            } else {
+              document.getElementById("instruction").innerHTML = "Press SPACE when you hear the sheep!";
+            }
             break;
           case 'CHOICE':
           case 'COMPLEX':
@@ -149,20 +166,26 @@
             displayResults();
             break;
         }
+
+        var displayDelay = Math.random() * 4 + 2;
+        window.setTimeout("showStimulus()", displayDelay * 1000);
       }
 
 
       function showStimulus() {
         switch(currentTask) {
           case 'SIMPLE':
-            if (stimuliCount < totalTestCount) {
+
+            if (stimuliCount < totalTestCount && !picResultsShown) {
               document.getElementById("stimulusArea").innerHTML = '<img src="sheep.jpg">';
             } else if (!picResultsShown) {
               displayResults();
-            } else if (stimuliCount < 2 * totalTestCount){
+              return;
+            } else if (stimuliCount < totalTestCount){
               document.getElementById("sheepSnd").play();
             } else {
-              tasks.splice(pos, tasks.indexOf('SIMPLE'));
+              tasks.splice(pos, tasks.indexOf(currentTask));
+              displayResults();
               return;
             }
             stimuliActive = true;
@@ -181,10 +204,13 @@
         }
       }
 
+      /* this function is called when a user correctly responds to a stimulusArea
+      */
       function completeStimulus() {
         var timeStimulusCompleted = new Date().getTime();
         var deltaTime = timeStimulusCompleted - timeStimulusStarted;
         times.push(deltaTime);
+        stimuliActive = false;
         document.getElementById("time").innerHTML = deltaTime + "ms";
         document.getElementById("stimulusArea").innerHTML = "";
         startTask();
@@ -193,13 +219,18 @@
       /* calculates, saves and shows the results and statistics
       */
       function displayResults() {
+        if (currentTask === 'SIMPLE' && !picResultsShown) {
+          picResultsShown = true;
+        }
         calculateStatistics();
         saveResults();
 
-        document.getElementById("count").innerHTML = "Count: " + sheepPicShown;
-    		document.getElementById("mean").innerHTML = "Mean: " + meanDeltaTimePic + "ms";
-    		document.getElementById("sd").innerHTML = "SD: " + standardDeviationPic +	"ms";
-    		document.getElementById("error").innerHTML = "Error rate: " + errorRatePic.toFixed(2) + "%";
+        document.getElementById("count").innerHTML = "Count: " + stimuliCount;
+    		document.getElementById("mean").innerHTML = "Mean: " + meanDeltaTime + "ms";
+    		document.getElementById("sd").innerHTML = "SD: " + standardDeviation +	"ms";
+    		document.getElementById("error").innerHTML = "Error rate: " + errorRate.toFixed(2) + "%";
+
+        document.getElementById("export").style.display = 'inline';
 
         showingResults = true;
       }
@@ -207,28 +238,47 @@
       /* calculates statistics for the current times
       */
       function calculateStatistics() {
-      	for (var i = 0; i < times.size; i++) {
+      	for (var i = 0; i < times.length; i++) {
       		meanDeltaTime += times[i];
       	}
 
-      	meanDeltaTime = Math.round(meanDeltaTime / times.size);
+      	meanDeltaTime = Math.round(meanDeltaTime / times.length);
 
-      	for (var i = start; i < times.size; i++) {
+      	for (var i = 0; i < times.length; i++) {
       		var diff = (times[i] - meanDeltaTime);
       		standardDeviation += diff * diff;
       	}
 
-      	standardDeviation = Math.round(Math.sqrt(standardDeviation / times.size);
+      	standardDeviation = Math.round(Math.sqrt(standardDeviation / times.length));
+
+        errorRate = errorCount / (errorCount + stimuliCount);
       }
 
       /* saves results and statistics for the current times
       */
       function saveResults() {
+        myCsv += currentTask;
 
+        if (currentTask === 'SIMPLE') {
+          if (!picResultsShown) {
+            myCsv += " PIC";
+          } else {
+            myCsv += " AUDIO";
+          }
+        }
+
+        myCsv += ",\nTIMES,";
+
+        for (var i = 0; i < times.length; i++) {
+          myCsv += times[i] + ",";
+        }
+        myCsv += "Count," + stimuliCount + ",Mean," + meanDeltaTime + ",SD," + standardDeviation + ",Error Rate," + errorRate + ",\n";
       }
 
-      function endExperiment() {
 
+      function endExperiment() {
+        setStartingState();
+        tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
       }
 
     </script>
@@ -240,6 +290,7 @@
     <p id="count"></p>
     <p id="mean"></p>
     <p id="sd"></p>
+    <p id="error"></p>
     <p id="stimulusArea"></p>
     <p><button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button></p>
   </body>
