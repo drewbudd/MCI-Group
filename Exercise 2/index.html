@@ -5,42 +5,186 @@
   </head>
   <body>
     <script type="text/javascript">
+      var myCsv;
+      var experimentActive = false;
+      var stimuliActive = false;
+      var aborting = false;
+      var name;
+      var age;
+      var gender;
+      var times;
+      var tasks;
+      var currentTask;
+      var stimuliCount;
+      var timeStimulusStarted;
+      var errorCount;
 
 
-    /* Function to handle keypresses
-     */
-    document.onkeydown = function onKey(e) {
+      /* Function to handle keypresses
+       */
+      document.onkeydown = function onKey(e) {
 
-  		if (e == null) {
-  			e = window.event;
-  		}
+    		if (e == null) {
+    			e = window.event;
+    		}
 
-  		switch (e.which || e.charCode || e.keyCode) {
-  			case 32:
-  			// space
+    		switch (e.which || e.charCode || e.keyCode) {
+    			case 32:
+    			// space
+              if (stimuliActive) {
+                completeStimulus();
+              } else {
+                errorCount++;
+              }
+    				break;
+    			case 65: // a
+              if (experimentActive) {
+                aborting = true;
+              }
+            break;
+    			case 83: //s
+            if (!experimentActive) {
+              startExperiment();
+            }
+            break;
+    				// here you can extend... alert("pressed the b key"); break;
+    				//break;
+    		}
 
-  				break;
-  			case 65: // a
+    	}
 
-          break;
-  			case 83: //s
+      /* sets all variables to their default starting state
+      */
+      function setStartingState() {
+        myCsv = "";
+        experimentActive = false;
+        stimuliActive = false;
+        aborting = false;
+        name = "";
+        age = "";
+        gender = "";
+        times = new Array();
+        tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
+        currentTask = '';
+        stimuliCount = 0;
+        errorCount = 0;
+      }
 
-          break;
-  				// here you can extend... alert("pressed the b key"); break;
-  				//break;
-  		}
+      /* Function to start the experiment, prompts user for information.
+      */
+      function startExperiment() {
+        setStartingState();
+        experimentActive = true;
+        document.getElementById("instruction").innerHTML = "";
+        collectUserInfo();
+      }
 
-  	}
+      /* Displays text entry fields for user's information
+      */
+      function collectUserInfo() {
+        document.getElementById("stimulusArea").innerHTML = '<p>Name <input id="name" type="text"></p><p>Age <input id="age" type="text"></p><p>Gender <input type="radio" name="gender" value="male">Male <input type="radio" name="gender" value="female">Female </p><p><button id="submit" onclick="saveUserData()">Submit</button></p>';
+      }
+
+      /* OnClick of submit button is all of the user's information saved and the next step is started.
+      */
+      function saveUserData() {
+        name = document.getElementById("name").value;
+        age = document.getElementById("age").value;
+        var genders = document.getElementsByName("gender");
+        for (var i = 0; i < genders.length; i++) {
+          if (genders[i].checked) {
+            gender = genders[i];
+          }
+        }
+
+        document.getElementById("stimulusArea").innerHTML = "";
+        selectTask();
+      }
+
+      /* Function to select one of the remaining tasks for the user
+      */
+      function selectTask() {
+        if (tasks.length == 0) {
+          endExperiment();
+          return;
+        }
+
+        var selection = Math.trunc(Math.random() * tasks.length);
+        //currentTask = tasks[selection];
+        currentTask = 'SIMPLE';
+        startTask();
+      }
+
+      function startTask() {
+        if (aborting) {
+          return;
+        }
+
+        var displayDelay = Math.random() * 4 + 2;
+        window.setTimeout("showStimulus()", displayDelay * 1000);
+
+        switch(currentTask) {
+          case 'SIMPLE':
+            break;
+          case 'CHOICE':
+          case 'COMPLEX':
+          case 'CREATIVE':
+            document.getElementById("stimulusArea").innerHTML = "CREATIVE";
+            break;
+          default:
+            displayResults();
+            break;
+        }
+      }
+
+
+      function showStimulus() {
+        switch(currentTask) {
+          case 'SIMPLE':
+            if (stimuliCount < 1) {
+              document.getElementById("stimulusArea").innerHTML = '<img src="sheep.jpg">';
+            } else if (stimuliCount < 40){
+              document.getElementById("sheepSnd").play();
+            } else {
+              tasks.splice(pos, tasks.indexOf('SIMPLE'));
+              currentTask = '';
+              return;
+            }
+            stimuliActive = true;
+            stimuliCount++;
+            timeStimulusStarted = new Date().getTime();
+          case 'CHOICE':
+            break;
+          case 'COMPLEX':
+            break;
+          case 'CREATIVE':
+            document.getElementById("stimulusArea").innerHTML = "CREATIVE";
+            break;
+          default:
+            selectTask();
+            break;
+        }
+      }
+
+      function completeStimulus() {
+        var timeStimulusCompleted = new Date().getTime();
+        var deltaTime = timeStimulusCompleted - timeStimulusStarted;
+        times.push(deltaTime);
+        document.getElementById("time").innerHTML = deltaTime + "ms";
+        document.getElementById("stimulusArea").innerHTML = "";
+        startTask();
+      }
 
     </script>
     <h1><p = "text">User Study</p></h1>
     <h1 id="instruction">Press "S" to start!</h1>
-    <p id="stimulusArea"></p>
+		<audio id="sheepSnd" src="sheep.wav" preload="auto"></audio>
     <br/>
     <p id="time"></p>
     <p id="count"></p>
     <p id="mean"></p>
     <p id="sd"></p>
+    <p id="stimulusArea"></p>
     <p><button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button></p>
   </body>
 </html>
