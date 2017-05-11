@@ -26,6 +26,15 @@
       var totalSimpleTestCount;
       var totalTestCount;
 
+      var cities = ['CITY', 'STUTTGART', 'MUNICH', 'LONDON', 'PARIS', 'DUBLIN', 'NEW YORK', 'BERLIN', 'TOKYO', 'MONTREAL', 'SYDNEY', 'LOS ANGELES', 'LIMA', 'MIAMI', 'ROME', 'BARCELONA', 'PRAGUE', 'MOSCOW'];
+      var countries = ['COUNTRY', 'GERMANY', 'FRANCE', 'RUSSIA', 'GHANA', 'UNITED KINGDOM', 'CANADA', 'BRAZIL', 'JAPAN', 'CHINA', 'INDIA', 'IRAQ', 'SAUDI ARABIA', 'VENEZUELA', 'PERU', 'VIETNAM'];
+      var animals = ['ANIMAL', 'DOG', 'CAT', 'FROG', 'PLATYPUS', 'WHALE', 'DOLPHIN', 'SWAN', 'HAWK', 'DUCK','PIG', 'COW', 'SHEEP', 'CHICKEN', 'WORM','SPIDER', 'OCTOPUS'];
+      var instruments = ['MUSICAL INSTRUMENT', 'GUITAR', 'PIANO', 'VIOLIN', 'FLUTE', 'CELLO', 'HARP', 'SNARE DRUM', 'XYLOPHONE', 'UKULELE', 'BASS', 'SAXOPHONE', 'CYMBALS', 'TRUMPET'];
+      var lists = [cities, countries, animals];
+      var complexActive = false;
+      var elementCategoryIndex;
+      var categoryIndex;
+
 
       /* Function to handle keypresses
        */
@@ -38,9 +47,11 @@
     		switch (e.which || e.charCode || e.keyCode) {
     			case 32:
     			// space
-              if (stimuliActive) {
+              if (complexActive) {
+                // do nothing
+              } else if (stimuliActive) {
                 completeStimulus();
-              } else {
+              }  else {
                 errorCount++;
               }
     				break;
@@ -59,6 +70,36 @@
               setStartingState();
               selectTask();
             }
+          case 49: //t
+            if (complexActive) {
+              if (categoryIndex == elementCategoryIndex) {
+                complexActive = false;
+                completeStimulus();
+              } else {
+                complexActive = false;
+                document.getElementById("stimulusArea").innerHTML = "";
+                document.getElementById("time").innerHTML = '<img src="wrong.jpg">';
+                stimuliCount--;
+                errorCount++;
+                startTask();
+              }
+            }
+            break;
+          case 48: //f
+            if (complexActive) {
+              if (categoryIndex != elementCategoryIndex) {
+                complexActive = false;
+                completeStimulus();
+              } else {
+                complexActive = false;
+                document.getElementById("stimulusArea").innerHTML = "";
+                document.getElementById("time").innerHTML = '<img src="wrong.jpg">';
+                stimuliCount--;
+                errorCount++;
+                startTask();
+              }
+            }
+            break;
     				// here you can extend... alert("pressed the b key"); break;
     				//break;
     		}
@@ -88,7 +129,7 @@
         meanDeltaTime = 0.0;
         standardDeviation = 0.0;
         totalSimpleTestCount = 20;
-        totalTestCount = 5;
+        totalTestCount = 25;
 
         document.getElementById("export").style.display = 'none';
         document.getElementById("text").style.display = 'none';
@@ -168,7 +209,10 @@
             document.getElementById("instruction").innerHTML = "Press SPACE when you see the square!  Ignore the circle!";
             break;
           case 'COMPLEX':
+            document.getElementById("instruction").innerHTML = "Press '1' when the statement is TRUE and '0' when the statement is FALSE.";
+            break;
           case 'CREATIVE':
+            tasks.splice(tasks.indexOf(currentTask), 1);
             selectTask();
             return;
             document.getElementById("stimulusArea").innerHTML = "CREATIVE";
@@ -236,6 +280,22 @@
         		}
             break;
           case 'COMPLEX':
+            document.getElementById("time").innerHTML = "";
+
+            categoryIndex = Math.trunc(Math.random() * lists.length);
+            var category = lists[categoryIndex];
+            elementCategoryIndex = Math.trunc(Math.random() * lists.length);
+            var elementCategory = lists[elementCategoryIndex];
+            var elementIndex = 0;
+            while (elementIndex < 1) {
+              elementIndex = Math.trunc(Math.random() * elementCategory.length);
+            }
+            var element = elementCategory[elementIndex];
+            document.getElementById("stimulusArea").innerHTML = element + " = " + category[0];
+
+            complexActive = true;
+            stimuliCount++;
+            timeStimulusStarted = new Date().getTime();
             break;
           case 'CREATIVE':
             document.getElementById("stimulusArea").innerHTML = "CREATIVE";
@@ -269,13 +329,13 @@
     		document.getElementById("sd").innerHTML = "SD: " + standardDeviation +	"ms";
     		document.getElementById("error").innerHTML = "Error rate: " + errorRate.toFixed(2) + "%";
 
-        document.getElementById("export").style.display = 'inline';
+        document.getElementById("instruction").innerHTML = "Good job!  Here are your results for this part.  Press 'C' to continue the experiment!";
 
         showingResults = true;
         if (currentTask === 'SIMPLE' && !picResultsShown) {
           picResultsShown = true;
         } else {
-          tasks.splice(pos, tasks.indexOf(currentTask));
+          tasks.splice(tasks.indexOf(currentTask), 1);
         }
       }
 
@@ -316,13 +376,15 @@
         for (var i = 0; i < times.length; i++) {
           myCsv += times[i] + ",";
         }
-        myCsv += "Count," + stimuliCount + ",Mean," + meanDeltaTime + ",SD," + standardDeviation + ",Error Rate," + errorRate + ",\n";
+        myCsv += "Count," + stimuliCount + ",Mean," + meanDeltaTime + ",SD," + standardDeviation + ",Error Rate," + errorRate + ",Errors," + errorCount + ",\n";
       }
 
 
       function endExperiment() {
-        setStartingState();
-        tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
+        document.getElementById("instruction").innerHTML = "Thank you so much for participating in our study!";
+        document.getElementById("export").style.display = 'inline';
+        //setStartingState();
+        //tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
       }
 
     </script>
