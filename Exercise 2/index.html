@@ -23,6 +23,7 @@
       var errorRate;
       var meanDeltaTime;
       var standardDeviation;
+      var totalSimpleTestCount;
       var totalTestCount;
 
 
@@ -86,7 +87,8 @@
         errorRate = 0.0;
         meanDeltaTime = 0.0;
         standardDeviation = 0.0;
-        totalTestCount = 20;
+        totalSimpleTestCount = 20;
+        totalTestCount = 5;
 
         document.getElementById("export").style.display = 'none';
         document.getElementById("text").style.display = 'none';
@@ -148,6 +150,9 @@
         if (aborting) {
           displayResults();
           return;
+        } else if (stimuliCount >= totalTestCount) {
+          displayResults();
+          return;
         }
 
         switch(currentTask) {
@@ -159,6 +164,9 @@
             }
             break;
           case 'CHOICE':
+            document.getElementById("stimulusArea").innerHTML = "";
+            document.getElementById("instruction").innerHTML = "Press SPACE when you see the square!  Ignore the circle!";
+            break;
           case 'COMPLEX':
           case 'CREATIVE':
             selectTask();
@@ -178,12 +186,12 @@
       function showStimulus() {
         switch(currentTask) {
           case 'SIMPLE':
-            if (stimuliCount < totalTestCount && !picResultsShown) {
+            if (stimuliCount < totalSimpleTestCount && !picResultsShown) {
               document.getElementById("stimulusArea").innerHTML = '<img src="sheep.jpg">';
             } else if (!picResultsShown) {
               displayResults();
               return;
-            } else if (stimuliCount < totalTestCount){
+            } else if (stimuliCount < totalSimpleTestCount){
               document.getElementById("sheepSnd").play();
             } else {
               displayResults();
@@ -192,7 +200,40 @@
             stimuliActive = true;
             stimuliCount++;
             timeStimulusStarted = new Date().getTime();
+            break;
           case 'CHOICE':
+            document.getElementById("stimulusArea").innerHTML = '<canvas id="shape" width="350" height="350"></canvas>';
+
+            var canvas = document.getElementById('shape');
+
+        		if (Math.random() < 0.5) {
+        			if (canvas.getContext) {
+        				var ctx = canvas.getContext('2d');
+        				var X = canvas.width / 2;
+        				var Y = canvas.height / 2;
+        				var R = (Math.random() * 100) + 75;
+
+        				ctx.beginPath();
+        				ctx.arc(X, Y, R, 0, 2 * Math.PI, false);
+        				ctx.fillStyle = 'black';
+        				ctx.fill();
+
+        				window.setTimeout("startTask()", 1250);
+        			}
+        		} else {
+        			if (canvas.getContext) {
+        				timeStimulusStarted = new Date().getTime();
+        				var ctx = canvas.getContext('2d');
+        				var H = (Math.random() * 100) + 75;
+        				ctx.rect((canvas.width/2) - (H/2) ,(canvas.height/2) - (H/2),H,H);
+        				ctx.fillStyle = 'black';
+        				ctx.fill();
+
+                stimuliActive = true;
+                stimuliCount++;
+                timeStimulusStarted = new Date().getTime();
+        			}
+        		}
             break;
           case 'COMPLEX':
             break;
