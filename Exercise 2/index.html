@@ -35,6 +35,9 @@
       var elementCategoryIndex;
       var categoryIndex;
 
+      var desiredSum;
+
+
 
       /* Function to handle keypresses
        */
@@ -182,6 +185,7 @@
 
         var selection = Math.trunc(Math.random() * tasks.length);
         currentTask = tasks[selection];
+        currentTask = 'CREATIVE';
         startTask();
       }
 
@@ -212,10 +216,8 @@
             document.getElementById("instruction").innerHTML = "Press '1' when the statement is TRUE and '0' when the statement is FALSE.";
             break;
           case 'CREATIVE':
-            tasks.splice(tasks.indexOf(currentTask), 1);
-            selectTask();
-            return;
-            document.getElementById("stimulusArea").innerHTML = "CREATIVE";
+            desiredSum = Math.trunc(Math.random() * 8) + 7;
+            document.getElementById("instruction").innerHTML = "Press SPACE when the sum of the dice is equal to " + desiredSum;
             break;
           default:
             displayResults();
@@ -298,7 +300,8 @@
             timeStimulusStarted = new Date().getTime();
             break;
           case 'CREATIVE':
-            document.getElementById("stimulusArea").innerHTML = "CREATIVE";
+            document.getElementById("stimulusArea").innerHTML = '';
+            window.setTimeout("showStimulus()", 12500);
             break;
           default:
             selectTask();
