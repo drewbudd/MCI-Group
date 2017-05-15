@@ -36,7 +36,11 @@
       var categoryIndex;
 
       var desiredSum;
-
+      var startingDelay = 1250;
+      var diceCount = 0;
+      var diceOne = 0;
+      var diceTwo = 0;
+      var diceThree = 0;
 
 
       /* Function to handle keypresses
@@ -54,13 +58,27 @@
                 // do nothing
               } else if (stimuliActive) {
                 completeStimulus();
-              }  else {
+              } else if (!stimuliActive && currentTask === 'CREATIVE'){
+                errorCount++;
+                document.getElementById("stimulusArea").innerHTML = 'GAME OVER<br/>Sorry, wrong answer!';
+                var timeStimulusCompleted = new Date().getTime();
+                var deltaTime = timeStimulusCompleted - timeStimulusStarted;
+                stimuliActive = false;
+                diceOne = 0;
+                diceTwo = 0;
+                diceThree = 0;
+                diceCount = 0;
+                document.getElementById("time").innerHTML = deltaTime + "ms";
+                document.getElementById("stimulusArea").innerHTML = "";
+                displayResults();
+              } else {
                 errorCount++;
               }
     				break;
     			case 65: // a
               if (experimentActive) {
                 aborting = true;
+                document.getElementById('abort').innerHTML = 'Aborting...experiment will end after this stimulus.';
               }
             break;
     			case 83: //s
@@ -69,7 +87,9 @@
             }
             break;
           case 67: //c
-            if(showingResults){
+            if (aborting) {
+              endExperiment();
+            } if(showingResults){
               setStartingState();
               selectTask();
             }
@@ -103,8 +123,6 @@
               }
             }
             break;
-    				// here you can extend... alert("pressed the b key"); break;
-    				//break;
     		}
 
     	}
@@ -141,6 +159,7 @@
     		document.getElementById("mean").innerHTML = "";
     		document.getElementById("sd").innerHTML = "";
     		document.getElementById("error").innerHTML = "";
+        document.getElementById('abort').innerHTML = "Press 'A' to abort the experiment.";
       }
 
       /* Function to start the experiment, prompts user for information.
@@ -183,9 +202,10 @@
           return;
         }
 
+        document.getElementById('abort').style.display = 'inline';
+
         var selection = Math.trunc(Math.random() * tasks.length);
         currentTask = tasks[selection];
-        currentTask = 'CREATIVE';
         startTask();
       }
 
@@ -195,7 +215,7 @@
         if (aborting) {
           displayResults();
           return;
-        } else if (stimuliCount >= totalTestCount) {
+        } else if (currentTask != 'CREATIVE' && stimuliCount >= totalTestCount) {
           displayResults();
           return;
         }
@@ -216,8 +236,13 @@
             document.getElementById("instruction").innerHTML = "Press '1' when the statement is TRUE and '0' when the statement is FALSE.";
             break;
           case 'CREATIVE':
-            desiredSum = Math.trunc(Math.random() * 8) + 7;
-            document.getElementById("instruction").innerHTML = "Press SPACE when the sum of the dice is equal to " + desiredSum;
+            desiredSum = Math.random();
+            if (desiredSum < 0.5) {
+              document.getElementById("instruction").innerHTML = "Press SPACE when the sum of the dice is between 8 and 11<br/><h6>You have a limited time to react, so be quick!</h6>";
+            } else {
+              document.getElementById("instruction").innerHTML = "Press SPACE when the sum of the dice is between 12 and 15<br/><h6>You have a limited time to react, so be quick!</h6>";
+            }
+            document.getElementById("stimulusArea").innerHTML = '<p id="one"></p><p id="two"></p><p id="three"></p>';
             break;
           default:
             displayResults();
@@ -300,11 +325,91 @@
             timeStimulusStarted = new Date().getTime();
             break;
           case 'CREATIVE':
-            document.getElementById("stimulusArea").innerHTML = '';
-            window.setTimeout("showStimulus()", 12500);
+            var randomDieValue = Math.trunc(Math.random() * 6) + 1;
+
+            if (diceCount % 3 == 0) {
+              diceOne = randomDieValue;
+              document.getElementById("one").innerHTML = randomDie(diceOne);
+            } else if (diceCount % 3 == 1) {
+              diceTwo = randomDieValue;
+              document.getElementById("two").innerHTML = randomDie(diceTwo);
+            } else {
+              diceThree = randomDieValue;
+              document.getElementById("three").innerHTML = randomDie(diceThree);
+            }
+            diceCount++;
+
+            var diceSum = (diceOne + diceTwo + diceThree);
+
+            if (desiredSum < 0.5) {
+              if ((diceSum > 7) && (diceSum < 12)) {
+                stimuliActive = true;
+                stimuliCount++;
+                timeStimulusStarted = new Date().getTime();
+                window.setTimeout("diceFailCheck()", startingDelay);
+                return;
+              }
+            } else {
+              if ((diceSum > 11) && (diceSum < 16)) {
+                stimuliActive = true;
+                stimuliCount++;
+                timeStimulusStarted = new Date().getTime();
+                window.setTimeout("diceFailCheck()", startingDelay);
+                return;
+              }
+            }
+
+            window.setTimeout("showStimulus()", startingDelay);
             break;
           default:
             selectTask();
+            break;
+        }
+      }
+
+      /* function to handle the case when a correct answer in show but the user fails to react fast enough
+      */
+      function diceFailCheck() {
+        if (stimuliActive) {
+          document.getElementById("stimulusArea").innerHTML = 'GAME OVER<br/>Too slow! You missed the correct answer!';
+          errorCount++;
+          stimuliCount--;
+          var timeStimulusCompleted = new Date().getTime();
+          var deltaTime = timeStimulusCompleted - timeStimulusStarted;
+          stimuliActive = false;
+          diceOne = 0;
+          diceTwo = 0;
+          diceThree = 0;
+          diceCount = 0;
+          document.getElementById("time").innerHTML = deltaTime + "ms";
+          document.getElementById("stimulusArea").innerHTML = "";
+          displayResults();
+        } else {
+          showStimulus();
+        }
+      }
+
+      /* returns a HTML string with a random dice image
+      */
+      function randomDie(value) {
+        switch(value) {
+          case 1:
+            return '<img src="1.jpg">';
+            break;
+          case 2:
+            return '<img src="2.jpg">';
+            break;
+          case 3:
+            return '<img src="3.jpg">';
+            break;
+          case 4:
+            return '<img src="4.jpg">';
+            break;
+          case 5:
+            return '<img src="5.jpg">';
+            break;
+          case 6:
+            return '<img src="6.jpg">';
             break;
         }
       }
@@ -316,9 +421,35 @@
         var deltaTime = timeStimulusCompleted - timeStimulusStarted;
         times.push(deltaTime);
         stimuliActive = false;
+
         document.getElementById("time").innerHTML = deltaTime + "ms";
         document.getElementById("stimulusArea").innerHTML = "";
+        if (currentTask == 'CREATIVE') {
+          diceOne = 0;
+          diceTwo = 0;
+          diceThree = 0;
+          diceCount = 0;
+          document.getElementById("instruction").innerHTML = "Correct, starting next round in a few seconds";
+          window.setTimeout("startTask()", 2000);
+          return;
+        }
         startTask();
+      }
+
+      /* this function is called when a stimulus has been show but should be ended without count it
+      */
+      function cancelStimulus() {
+        timeStimulusStarted = 0;
+        stimuliActive = false;
+
+        document.getElementById("time").innerHTML = deltaTime + "ms";
+        document.getElementById("stimulusArea").innerHTML = "";
+        if (currentTask == 'CREATIVE') {
+          diceOne = 0;
+          diceTwo = 0;
+          diceThree = 0;
+          diceCount = 0;
+        }
       }
 
       /* calculates, saves and shows the results and statistics
@@ -332,7 +463,17 @@
     		document.getElementById("sd").innerHTML = "SD: " + standardDeviation +	"ms";
     		document.getElementById("error").innerHTML = "Error rate: " + errorRate.toFixed(2) + "%";
 
-        document.getElementById("instruction").innerHTML = "Good job!  Here are your results for this part.  Press 'C' to continue the experiment!";
+        if (tasks.length < 1) {
+          document.getElementById("instruction").innerHTML = "Good job!  Here are your results for this part.  Press 'C' to complete the experiment!";
+        } else {
+          document.getElementById("instruction").innerHTML = "Good job!  Here are your results for this part.  Press 'C' to continue the experiment!";
+        }
+
+        document.getElementById("abort").style.display = 'none';
+
+        if (aborting) {
+          document.getElementById("export").style.display = 'inline';
+        }
 
         showingResults = true;
         if (currentTask === 'SIMPLE' && !picResultsShown) {
@@ -382,12 +523,11 @@
         myCsv += "Count," + stimuliCount + ",Mean," + meanDeltaTime + ",SD," + standardDeviation + ",Error Rate," + errorRate + ",Errors," + errorCount + ",\n";
       }
 
-
+      /* function to show thank you screen and export button
+      */
       function endExperiment() {
         document.getElementById("instruction").innerHTML = "Thank you so much for participating in our study!";
         document.getElementById("export").style.display = 'inline';
-        //setStartingState();
-        //tasks = ['SIMPLE', 'CHOICE', 'COMPLEX', 'CREATIVE'];
       }
 
     </script>
@@ -400,6 +540,7 @@
     <p id="mean"></p>
     <p id="sd"></p>
     <p id="error"></p>
+    <p id="abort" style="display:none">Press 'A' to abort the experiment</p>
     <p id="stimulusArea"></p>
     <p><button id="export" onclick="exportToCsv()" style="display:none">export results to CSV</button></p>
   </body>
