@@ -1,4 +1,6 @@
 int x, y, widthCircle; //<>//
+int newX, newY;
+double distance;
 
 int count = 1;
 void setup() {
@@ -12,8 +14,26 @@ void draw() {
 
 void drawCircle() {
   widthCircle = round(random(1, 6) * 10);
-  x = round(random(0 + widthCircle, 1024 - widthCircle));
-  y = round(random(0 + widthCircle, 768 - widthCircle));
+  
+  if (count < 1) {
+    do {
+      newX = round(random(0 + widthCircle, 1024 - widthCircle));
+      newY = round(random(0 + widthCircle, 768 - widthCircle));
+      distance = sqrt(pow(abs(x-newX),2)+pow(abs(y-newY),2));
+    } while (distance < 30);
+    
+    text(x-newX, 10, 10);
+    text(y-newY, 10, 20);
+  
+    x = newX;
+    y = newY;
+    
+    
+  } else {
+    x = round(random(0 + widthCircle, 1024 - widthCircle));
+    y = round(random(0 + widthCircle, 768 - widthCircle));
+  }
+  
   noStroke();
   fill(0, 255, 0);
   ellipse(x, y, widthCircle, widthCircle);
