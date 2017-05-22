@@ -1,8 +1,8 @@
+int count = 1;
 int x, y, widthCircle; //<>//
 int newX, newY;
 double distance;
 
-int count = 1;
 void setup() {
   //start = true;
   size(1024, 768);
