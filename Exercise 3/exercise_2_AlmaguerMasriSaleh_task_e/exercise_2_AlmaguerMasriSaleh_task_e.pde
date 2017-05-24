@@ -2,6 +2,7 @@ int count = 1; //<>//
 
 int x, y, widthIndex; //<>//
 int newX, newY;
+int currentDiameter;
 double distance;
 ArrayList<Integer> sizes = new ArrayList<Integer>();
 
@@ -16,7 +17,15 @@ void draw() {
 }
 
 void drawCircle() {
-  widthIndex = round(random(0, sizes.size()-1));
+  if (sizes.size() == 0) {
+    background(255);
+    text("DONE", 500, 30);
+    return;
+  }
+  
+  widthIndex = floor(random(0, sizes.size()-1));
+  noStroke();
+  fill(0, 255, 0);
   
   if (count < 1) {
     do {
@@ -32,16 +41,14 @@ void drawCircle() {
   
     x = newX;
     y = newY;
-    
-    sizes.remove(widthIndex);
   } else {
     x = round(random(0 + sizes.get(widthIndex), 1024 - sizes.get(widthIndex)));
     y = round(random(0 + sizes.get(widthIndex), 768 - sizes.get(widthIndex)));
   }
   
-  noStroke();
-  fill(0, 255, 0);
-  ellipse(x, y, sizes.get(widthIndex), sizes.get(widthIndex));
+  currentDiameter = sizes.get(widthIndex);
+  ellipse(x, y, currentDiameter, currentDiameter);
+  sizes.remove(widthIndex);
 }
 
 
@@ -55,17 +62,24 @@ void keyPressed() {
 
 void mouseReleased() {
 
-  if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY)))< (sizes.get(widthIndex)/2)) {
+  if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY)))< (currentDiameter/2)) {
     background(255);
     drawCircle();
   }
 }
 
 void generateArray() {
-  for (int i = 5; i < 30; i += 5) {
+  ArrayList<Integer> diameters = new ArrayList();
+  diameters.add(10);
+  diameters.add(20);
+  diameters.add(40);
+  diameters.add(60);
+  diameters.add(100);
+  
+  for (Integer diameter : diameters) {
     int twenty = 20;
     while (twenty > 0) {
-      sizes.add(i);
+      sizes.add(diameter);
       twenty--;
     }
   }
