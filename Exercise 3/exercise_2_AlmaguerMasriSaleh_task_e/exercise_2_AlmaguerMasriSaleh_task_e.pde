@@ -1,15 +1,20 @@
 int count = 1; //<>//
-int x, y, widthIndex; //<>//
+int x, y, widthIndex; //<>// //<>//
 int newX, newY; //<>//
 double distance;
 int mStart, msEnd, movedTime;
-ArrayList<Integer> singleTest = new ArrayList<Integer>();
-ArrayList<ArrayList<Integer>> evaluation = new ArrayList<ArrayList<Integer>>();
 int currentDiameter;
 ArrayList<Integer> sizes = new ArrayList<Integer>();
 boolean newCircle;
+Table table;
 
 void setup() {
+  table = new Table();
+  table.addColumn("size");
+  table.addColumn("distance");
+  table.addColumn("time");
+  table.addColumn("constant b");
+  
   //start = true;
   size(1024, 768);
   background(255);
@@ -23,12 +28,14 @@ void draw() {
 void drawCircle() {
   if (sizes.size() == 0) {
     background(255);
-    text("DONE", 500, 30);
+    textSize(68);
+    text("DONE", 420, 300);
+    saveTable(table, "test.csv");
     return;
   }
   
   mStart = millis();
-  text(mStart, 10, 600);
+  //text(mStart, 10, 600);
   widthIndex = floor(random(0, sizes.size()-1));
   noStroke();
   fill(0, 255, 0);
@@ -40,11 +47,11 @@ void drawCircle() {
       distance = sqrt(pow(abs(x-newX),2)+pow(abs(y-newY),2));
     } while (distance < 30);
     
-    text(x-newX, 10, 20);
+    /*text(x-newX, 10, 20);
     text(y-newY, 10, 40);
     text(sizes.get(widthIndex), 10, 60);
     text(sizes.size(), 10, 80);
-    text(new Double(distance).intValue(), 10, 100);
+    text(new Double(distance).intValue(), 10, 100);*/
   
     x = newX;
     y = newY;    
@@ -64,6 +71,7 @@ void keyPressed() {
   if (key == 's' && (count > 0 )) {
     drawCircle();
     count--;
+    msEnd = millis();
   }
   
   
@@ -75,14 +83,13 @@ void mouseReleased() {
   if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY))) < (currentDiameter/2)) {
     msEnd = millis();
     int deltaTime = msEnd - mStart;
-    singleTest.add(currentDiameter);
-    singleTest.add(new Double(distance).intValue());
-    singleTest.add(deltaTime);
-    singleTest.add(movedTime);
-    evaluation.add(singleTest);
-    singleTest.clear();
+    TableRow newRow = table.addRow();
+    newRow.setInt("size", currentDiameter);
+    newRow.setInt("distance", new Double(distance).intValue());
+    newRow.setInt("time", deltaTime);
+    newRow.setInt("constant b", movedTime);
     background(255);
-    text(deltaTime, 500, 500);
+    //text(deltaTime, 500, 500);
     drawCircle();
 
   }
@@ -91,12 +98,11 @@ void mouseReleased() {
 void mouseMoved() {
   if (newCircle) {
     newCircle = false;
-    movedTime = millis();
-    text(movedTime - msEnd, 500, 600);
+    movedTime = millis()-msEnd;
   }
 }
   
-  void generateArray() {
+void generateArray() {
   ArrayList<Integer> diameters = new ArrayList();
   diameters.add(10);
   diameters.add(20);
