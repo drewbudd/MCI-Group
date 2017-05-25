@@ -1,15 +1,18 @@
-int count = 1; //<>//
-
+int count = 1;
 int x, y, widthIndex; //<>//
 int newX, newY;
-int currentDiameter;
 double distance;
+int mStart, msEnd;
+ArrayList<Integer> singleTest = new ArrayList<Integer>();
+ArrayList<ArrayList<Integer>> evaluation = new ArrayList<>();
+int currentDiameter;
 ArrayList<Integer> sizes = new ArrayList<Integer>();
 
 void setup() {
   //start = true;
   size(1024, 768);
   background(255);
+  textSize(20);
   generateArray();
 }
 
@@ -23,6 +26,8 @@ void drawCircle() {
     return;
   }
   
+  mStart = millis();
+  text(mStart, 10, 600);
   widthIndex = floor(random(0, sizes.size()-1));
   noStroke();
   fill(0, 255, 0);
@@ -40,7 +45,7 @@ void drawCircle() {
     text(sizes.size(), 10, 40);
   
     x = newX;
-    y = newY;
+    y = newY;    
   } else {
     x = round(random(0 + sizes.get(widthIndex), 1024 - sizes.get(widthIndex)));
     y = round(random(0 + sizes.get(widthIndex), 768 - sizes.get(widthIndex)));
@@ -57,18 +62,28 @@ void keyPressed() {
     drawCircle();
     count--;
   }
+  
+  
 }
 
 
 void mouseReleased() {
 
   if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY)))< (currentDiameter/2)) {
+    msEnd = millis();
+    int deltaTime = msEnd - mStart;
+    singleTest.add(deltaTime);
+    singleTest.add(new Double(distance).intValue());
+    evaluation.add(singleTest);
+    singleTest.clear();
     background(255);
+    text(deltaTime, 500, 500);
     drawCircle();
+
   }
 }
-
-void generateArray() {
+  
+  void generateArray() {
   ArrayList<Integer> diameters = new ArrayList();
   diameters.add(10);
   diameters.add(20);
