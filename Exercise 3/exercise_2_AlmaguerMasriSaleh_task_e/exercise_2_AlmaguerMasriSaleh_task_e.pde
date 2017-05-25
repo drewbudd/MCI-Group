@@ -2,29 +2,24 @@ int count = 1;
 int x, y, widthCircle; //<>//
 int newX, newY;
 double distance;
-int ms;
+int mStart, msEnd;
+ArrayList<Integer> singleTest = new ArrayList<Integer>();
+ArrayList<ArrayList<Integer>> evaluation = new ArrayList<>();
 
 void setup() {
   //start = true;
   size(1024, 768);
   background(255);
-  frameRate(1000);
   textSize(20);
-  ms = 0;
+ 
 }
 
 void draw() {
-  ms ++;
-  if (ms % 50 == 0){
-    background(255);
-    text(ms, 10, 80);
-  }
-
 }
 
 void drawCircle() {
-  
-  ms = 0;
+  mStart = millis();
+  text(mStart, 10, 600);
   widthCircle = round(random(1, 6) * 10);
   
   if (count < 1) {
@@ -63,8 +58,14 @@ void keyPressed() {
 void mouseReleased() {
 
   if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY)))< (widthCircle/2)) {
+    msEnd = millis();
+    int deltaTime = msEnd - mStart;
+    singleTest.add(deltaTime);
+    singleTest.add(new Double(distance).intValue());
+    evaluation.add(singleTest);
+    singleTest.clear();
     background(255);
-    text (ms , 10 , 50);
+    text(deltaTime, 500, 500);
     drawCircle();
 
   }
