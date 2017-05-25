@@ -49,9 +49,9 @@ void drawCircle() {
     
     /*text(x-newX, 10, 20);
     text(y-newY, 10, 40);
-    text(sizes.get(widthIndex), 10, 60);
-    text(sizes.size(), 10, 80);
-    text(new Double(distance).intValue(), 10, 100);*/
+    text(sizes.get(widthIndex), 10, 60);*/
+    text(sizes.size(), 10, 20);
+    //text(new Double(distance).intValue(), 10, 100);
   
     x = newX;
     y = newY;    
