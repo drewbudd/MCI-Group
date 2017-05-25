@@ -1,12 +1,13 @@
-int count = 1;
+int count = 1; //<>//
 int x, y, widthIndex; //<>//
-int newX, newY;
+int newX, newY; //<>//
 double distance;
-int mStart, msEnd;
+int mStart, msEnd, movedTime;
 ArrayList<Integer> singleTest = new ArrayList<Integer>();
-ArrayList<ArrayList<Integer>> evaluation = new ArrayList<>();
+ArrayList<ArrayList<Integer>> evaluation = new ArrayList<ArrayList<Integer>>();
 int currentDiameter;
 ArrayList<Integer> sizes = new ArrayList<Integer>();
+boolean newCircle;
 
 void setup() {
   //start = true;
@@ -39,10 +40,11 @@ void drawCircle() {
       distance = sqrt(pow(abs(x-newX),2)+pow(abs(y-newY),2));
     } while (distance < 30);
     
-    text(x-newX, 10, 10);
-    text(y-newY, 10, 20);
-    text(sizes.get(widthIndex), 10, 30);
-    text(sizes.size(), 10, 40);
+    text(x-newX, 10, 20);
+    text(y-newY, 10, 40);
+    text(sizes.get(widthIndex), 10, 60);
+    text(sizes.size(), 10, 80);
+    text(new Double(distance).intValue(), 10, 100);
   
     x = newX;
     y = newY;    
@@ -53,6 +55,7 @@ void drawCircle() {
   
   currentDiameter = sizes.get(widthIndex);
   ellipse(x, y, currentDiameter, currentDiameter);
+  newCircle = true;
   sizes.remove(widthIndex);
 }
 
@@ -69,17 +72,27 @@ void keyPressed() {
 
 void mouseReleased() {
 
-  if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY)))< (currentDiameter/2)) {
+  if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY))) < (currentDiameter/2)) {
     msEnd = millis();
     int deltaTime = msEnd - mStart;
-    singleTest.add(deltaTime);
+    singleTest.add(currentDiameter);
     singleTest.add(new Double(distance).intValue());
+    singleTest.add(deltaTime);
+    singleTest.add(movedTime);
     evaluation.add(singleTest);
     singleTest.clear();
     background(255);
     text(deltaTime, 500, 500);
     drawCircle();
 
+  }
+}
+
+void mouseMoved() {
+  if (newCircle) {
+    newCircle = false;
+    movedTime = millis();
+    text(movedTime - msEnd, 500, 600);
   }
 }
   
