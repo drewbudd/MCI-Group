@@ -1,6 +1,6 @@
-int count = 1; //<>//
-int x, y, widthIndex; //<>// //<>//
-int newX, newY; //<>//
+int count = 1;
+int x, y, widthIndex; //<>//
+int newX, newY;
 double distance;
 int mStart, msEnd, movedTime;
 int currentDiameter;
@@ -30,7 +30,7 @@ void drawCircle() {
     background(255);
     textSize(68);
     text("DONE", 420, 300);
-    saveTable(table, "test.csv");
+    saveTable(table, "female16touchpad.csv");
     return;
   }
   
