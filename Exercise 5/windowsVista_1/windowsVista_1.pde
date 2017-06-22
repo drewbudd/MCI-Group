@@ -22,9 +22,7 @@ void draw() {
 
   for (int i = 0; i < windows.size(); i++) {
     Window window = windows.get(i);
-    if (window.hasFocus) {
-      window.dragWindow();
-    }
+    window.dragWindow();
     window.drawWindow();
   }
 }
@@ -33,22 +31,12 @@ class Window {
   int diameter;
   int x;
   int y;
-  boolean hasFocus;
 
   Window(int diameter, int x, int y) {
     this.diameter = diameter;
     this.x = x;
     this.y = y;
-    hasFocus = false;
     drawWindow();
-  }
-
-  void receiveFocus() {
-    hasFocus = true;
-  }
-  
-  void loseFocus() {
-    hasFocus = false;
   }
 
   void drawWindow() {
@@ -64,10 +52,16 @@ class Window {
     ellipse(x + (diameter/2 * cos(radians(225))), y - (diameter/2 * sin(radians(225))), 40, 40 );
   }
 
-
+boolean mouseInWindow(){
+   if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY))) < (diameter/2)) {
+     return true;
+   }else{
+     return false;
+   }
+}
   void dragWindow() {
     if (mousePressed) {
-      if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY))) < (diameter/2)) {
+      if (mouseInWindow()) {
         if (sqrt(((width/2 - mouseX) * (width/2 - mouseX)) + ((height/2 - mouseY) * (height/2-mouseY))) < (height/2)-(diameter/2)) {
           x = mouseX;
           y = mouseY;
@@ -81,6 +75,7 @@ class Window {
   boolean closingWindow() {
     if (mousePressed) {
       if (sqrt(((x + (diameter/2 * cos(radians(30))) - mouseX) * (x + (diameter/2 * cos(radians(30))) - mouseX)) + ((y - (diameter/2 * sin(radians(30)))- mouseY) * (y- (diameter/2 * sin(radians(30)))-mouseY))) < 20) {
+        focusIndex--;
         return  true;
       }
     }
@@ -93,9 +88,7 @@ class Window {
 void keyPressed() {
   if (key == 'n') {
     Window window = new Window(500, width/2, height/2);
-    if (windows.size() == 0) {
-      window.receiveFocus();
-    }
+    focusIndex ++;
     windows.add(window);
   } else if (key == CODED) {
     if (keyCode == ESC) {
