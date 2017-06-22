@@ -27,11 +27,12 @@ void draw() {
     }
     if ((i == focusIndex) && window.mouseInWindow()) {
       window.dragWindow();
+      window.rotateWindow();
     } else {
       window.drawWindow();
     }
   }
-  
+
   if (focusIndex != -1) {
     windows.get(focusIndex).drawWindow();
   }
@@ -62,29 +63,57 @@ class Window {
     ellipse(x + (diameter/2 * cos(radians(225))), y - (diameter/2 * sin(radians(225))), 40, 40 );
   }
 
-boolean mouseInWindow(){
-   if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY))) < (diameter/2)) {
-     return true;
-   }else{
-     return false;
-   }
-}
+  boolean mouseInWindow() {
+    if (sqrt(((x - mouseX) * (x - mouseX)) + ((y - mouseY) * (y-mouseY))) < (diameter/2)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  boolean mouseOnOrangeButton() {
+    if (sqrt(pow((x + (diameter/2 * cos(radians(225))) - mouseX), 2)+ pow((y + (diameter/2 * sin(radians(225))) - mouseY), 2))< 20) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  boolean mouseOnCloseButton() {
+    if (sqrt(pow((x + (diameter/2 * cos(radians(30))) - mouseX), 2) + pow((y - (diameter/2 * sin(radians(30)))- mouseY), 2)) < 20) {
+      return true ;
+    } else {
+      return false;
+    }
+  }
+
   void dragWindow() {
     if (mousePressed) {
-      if (mouseInWindow()) {
-        if (sqrt(((width/2 - mouseX) * (width/2 - mouseX)) + ((height/2 - mouseY) * (height/2-mouseY))) < (height/2)-(diameter/2)) {
-          x = mouseX;
-          y = mouseY;
-          pushMatrix();
-          translate(x, y);
-          popMatrix();
-        }
+      if (sqrt(((width/2 - mouseX) * (width/2 - mouseX)) + ((height/2 - mouseY) * (height/2-mouseY))) < (height/2)-(diameter/2)) {
+        x = mouseX;
+        y = mouseY;
+        pushMatrix();
+        translate(x, y);
+        popMatrix();
       }
     }
   }
+
+
+
+  void rotateWindow() {
+    if (mousePressed) {
+      if (mouseOnOrangeButton) {
+        pushMatrix();
+        rotate(radians(45));
+        popMatrix();
+      }
+    }
+  }
+
+
   boolean closingWindow() {
     if (mousePressed) {
-      if (sqrt(((x + (diameter/2 * cos(radians(30))) - mouseX) * (x + (diameter/2 * cos(radians(30))) - mouseX)) + ((y - (diameter/2 * sin(radians(30)))- mouseY) * (y- (diameter/2 * sin(radians(30)))-mouseY))) < 20) {
+      if (mouseOnCloseButton()) {
         focusIndex--;
         return  true;
       }
@@ -98,7 +127,7 @@ boolean mouseInWindow(){
 void keyPressed() {
   if (key == 'n') {
     Window window = new Window(500, width/2, height/2);
-    if( focusIndex == -1){
+    if ( focusIndex == -1) {
       focusIndex = 0;
     }
     windows.add(window);
