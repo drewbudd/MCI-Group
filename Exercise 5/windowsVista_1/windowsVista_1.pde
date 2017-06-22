@@ -22,8 +22,18 @@ void draw() {
 
   for (int i = 0; i < windows.size(); i++) {
     Window window = windows.get(i);
-    window.dragWindow();
-    window.drawWindow();
+    if (!(windows.get(focusIndex).mouseInWindow()) && window.mouseInWindow() && mousePressed) {
+      focusIndex = i;
+    }
+    if ((i == focusIndex) && window.mouseInWindow()) {
+      window.dragWindow();
+    } else {
+      window.drawWindow();
+    }
+  }
+  
+  if (focusIndex != -1) {
+    windows.get(focusIndex).drawWindow();
   }
 }
 
@@ -88,7 +98,9 @@ boolean mouseInWindow(){
 void keyPressed() {
   if (key == 'n') {
     Window window = new Window(500, width/2, height/2);
-    focusIndex ++;
+    if( focusIndex == -1){
+      focusIndex = 0;
+    }
     windows.add(window);
   } else if (key == CODED) {
     if (keyCode == ESC) {
