@@ -51,7 +51,7 @@ void draw() {
 }
 
 class Window {
-  float rotation = radians(0);
+  float rotation = 0;
   int diameter;
   int x;
   int y;
@@ -67,13 +67,13 @@ class Window {
 
     fill(238, 122, 233);
     ellipse(x, y, diameter, diameter);
-    ellipse(x + (diameter/2 * cos(radians(45) + rotation)), y - (diameter/2 * sin(radians(45) + rotation)), 40, 40 );
-    ellipse(x + (diameter/2 * cos(radians(30) + rotation)), y - (diameter/2 * sin(radians(30) + rotation)), 40, 40 );
-    ellipse(x + (diameter/2 * cos(radians(60) + rotation)), y - (diameter/2 * sin(radians(60) + rotation)), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(45)+ rotation)), y - (diameter/2 * sin(radians(45)+ rotation)), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(30)+ rotation)), y - (diameter/2 * sin(radians(30)+ rotation)), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(60)+ rotation)), y - (diameter/2 * sin(radians(60)+ rotation)), 40, 40 );
     fill(255);
     ellipse(x, y, diameter - 5, diameter - 5);
     fill(255, 140, 0);
-    ellipse(x + (diameter/2 * cos(radians(225) + rotation)), y - (diameter/2 * sin(radians(225) + rotation)), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(225)+rotation)), y - (diameter/2 * sin(radians(225)+rotation)), 40, 40 );
   }
 
   boolean mouseInWindow() {
@@ -84,7 +84,7 @@ class Window {
     }
   }
   boolean mouseOnOrangeButton() {
-    if (sqrt(pow((x + (diameter/2 * cos(radians(225))) - mouseX), 2)+ pow((y + (diameter/2 * sin(radians(225))) - mouseY), 2))< 20) {
+    if (sqrt(pow((x + (diameter/2 * cos(radians(225))) - mouseX), 2)+ pow((y - (diameter/2 * sin(radians(225))) - mouseY), 2))< 20) {
       return true;
     } else {
       return false;
@@ -115,24 +115,13 @@ class Window {
 
   void rotateWindow() {
     if (mousePressed) {
-      if (mouseOnOrangeButton()) {       
-        pushMatrix();
-        rotate(radians(45));
-        popMatrix();
-      }
+      rotation = (x-mouseX) / sqrt(pow(x-mouseX, 2)+pow(y-mouseY, 2));
+      pushMatrix();
+      rotate(rotation);
+      popMatrix();
     }
   }
 
-
-  //boolean closingWindow() {
-  //  if (mousePressed) {
-  //    if (mouseOnCloseButton()) {
-  //      focusIndex--;
-  //      return  true;
-  //    }
-  //  }
-  //  return false;
-  //}
 }
 
 
@@ -150,3 +139,5 @@ void keyPressed() {
     }
   }
 }
+
+
