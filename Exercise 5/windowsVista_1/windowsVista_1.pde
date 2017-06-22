@@ -86,18 +86,6 @@ class Window {
     }
     return false;
   }
-  //void keyMoveUp () {
-  //  this.y = this.y- 10;
-  //}
-  //void keyMoveDown () {
-  //  this.y = this.y+ 10;
-  //}
-  //void keyMoveRight () {
-  //  this.x = this.x+ 10;
-  //}
-  //void keyMoveLeft () {
-  //  this.x = this.x- 10;
-  //}
 }
 
 
@@ -112,22 +100,6 @@ void keyPressed() {
   } else if (key == CODED) {
     if (keyCode == ESC) {
       exit();
-      //} else if (keyCode == UP) {
-      //  for (Window window : windows) {
-      //    window.keyMoveUp();
-      //  }
-      //} else if (keyCode == DOWN) {
-      //  for (Window window : windows) {
-      //    window.keyMoveDown();
-      //  }
-      //} else if (keyCode == RIGHT) {
-      //  for (Window window : windows) {
-      //    window.keyMoveRight();
-      //  }
-      //} else if (keyCode == LEFT) {
-      //  for (Window window : windows) {
-      //    window.keyMoveLeft();
-      //  }
     }
   }
 }
