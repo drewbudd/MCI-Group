@@ -22,6 +22,18 @@ void draw() {
 
   for (int i = 0; i < windows.size(); i++) {
     Window window = windows.get(i);
+    
+    if (mousePressed && window.mouseOnCloseButton()) {
+      windows.remove(i);
+      if (i < focusIndex) {
+        focusIndex--;
+      } else if (i == focusIndex) {
+        focusIndex--;
+      }
+      i--;
+      continue;
+    }
+    
     if (!(windows.get(focusIndex).mouseInWindow()) && window.mouseInWindow() && mousePressed) {
       focusIndex = i;
     }
@@ -39,6 +51,7 @@ void draw() {
 }
 
 class Window {
+  float rotation = radians(0);
   int diameter;
   int x;
   int y;
@@ -54,13 +67,13 @@ class Window {
 
     fill(238, 122, 233);
     ellipse(x, y, diameter, diameter);
-    ellipse(x + (diameter/2 * cos(radians(45))), y - (diameter/2 * sin(radians(45))), 40, 40 );
-    ellipse(x + (diameter/2 * cos(radians(30))), y - (diameter/2 * sin(radians(30))), 40, 40 );
-    ellipse(x + (diameter/2 * cos(radians(60))), y - (diameter/2 * sin(radians(60))), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(45) + rotation)), y - (diameter/2 * sin(radians(45) + rotation)), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(30) + rotation)), y - (diameter/2 * sin(radians(30) + rotation)), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(60) + rotation)), y - (diameter/2 * sin(radians(60) + rotation)), 40, 40 );
     fill(255);
     ellipse(x, y, diameter - 5, diameter - 5);
     fill(255, 140, 0);
-    ellipse(x + (diameter/2 * cos(radians(225))), y - (diameter/2 * sin(radians(225))), 40, 40 );
+    ellipse(x + (diameter/2 * cos(radians(225) + rotation)), y - (diameter/2 * sin(radians(225) + rotation)), 40, 40 );
   }
 
   boolean mouseInWindow() {
@@ -102,7 +115,7 @@ class Window {
 
   void rotateWindow() {
     if (mousePressed) {
-      if (mouseOnOrangeButton) {
+      if (mouseOnOrangeButton()) {       
         pushMatrix();
         rotate(radians(45));
         popMatrix();
@@ -111,15 +124,15 @@ class Window {
   }
 
 
-  boolean closingWindow() {
-    if (mousePressed) {
-      if (mouseOnCloseButton()) {
-        focusIndex--;
-        return  true;
-      }
-    }
-    return false;
-  }
+  //boolean closingWindow() {
+  //  if (mousePressed) {
+  //    if (mouseOnCloseButton()) {
+  //      focusIndex--;
+  //      return  true;
+  //    }
+  //  }
+  //  return false;
+  //}
 }
 
 
